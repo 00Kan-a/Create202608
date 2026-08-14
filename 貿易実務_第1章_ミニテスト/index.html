@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>貿易実務検定 第1章 海上貨物輸送 ミニテスト</title>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --fg:#1c1f23; --sub:#6b7280; --line:#e3e6ea;
+  --accent:#1565c0; --accent-soft:#e8f1fb;
+  --ok:#1b7f4d; --ok-soft:#e6f4ec;
+  --ng:#c62828; --ng-soft:#fdeaea;
+  --warn:#b26a00;
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14171b; --card:#1d2126; --fg:#e8eaed; --sub:#9aa3ad; --line:#2c3238;
+    --accent:#6ba7ea; --accent-soft:#1b2a3b;
+    --ok:#59c98d; --ok-soft:#16301f;
+    --ng:#f08a8a; --ng-soft:#331a1a;
+    --warn:#e0a34a;
+  }
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  line-height:1.7; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:760px; margin:0 auto; padding:16px 16px 64px;}
+
+header.app{display:flex; align-items:center; gap:12px; padding:14px 0 18px; flex-wrap:wrap}
+header.app h1{font-size:1.05rem; margin:0; font-weight:700; letter-spacing:.02em}
+header.app .sub{font-size:.78rem; color:var(--sub); margin:0}
+.badge{margin-left:auto; background:var(--accent-soft); color:var(--accent); border-radius:999px;
+  padding:5px 13px; font-size:.8rem; font-weight:700; white-space:nowrap}
+
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:20px; margin-bottom:14px}
+.card h2{margin:0 0 4px; font-size:1rem}
+.card p.lead{margin:0 0 16px; color:var(--sub); font-size:.86rem}
+
+button{font-family:inherit; font-size:1rem; cursor:pointer; border-radius:10px; border:1px solid transparent}
+button:disabled{cursor:default; opacity:.55}
+.btn{display:block; width:100%; padding:14px; background:var(--accent); color:#fff; font-weight:700;
+  transition:filter .15s}
+.btn:hover:not(:disabled){filter:brightness(1.08)}
+.btn.sec{background:transparent; color:var(--accent); border-color:var(--line)}
+.btn.ghost{background:transparent; color:var(--sub); border-color:var(--line); font-weight:500; font-size:.86rem; padding:10px}
+.btn+.btn{margin-top:10px}
+
+.stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px}
+.stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 8px; text-align:center}
+.stat b{display:block; font-size:1.5rem; line-height:1.25; font-variant-numeric:tabular-nums}
+.stat span{font-size:.72rem; color:var(--sub)}
+
+/* quiz */
+.progress{display:flex; align-items:center; gap:10px; margin-bottom:14px; font-size:.8rem; color:var(--sub)}
+.bar{flex:1; height:6px; background:var(--line); border-radius:99px; overflow:hidden}
+.bar i{display:block; height:100%; background:var(--accent); transition:width .3s}
+.tag{display:inline-block; font-size:.7rem; padding:3px 9px; border-radius:999px;
+  background:var(--accent-soft); color:var(--accent); font-weight:700; margin-bottom:10px}
+.qtext{font-size:1.02rem; margin:0 0 20px; font-weight:500}
+.choices{display:flex; flex-direction:column; gap:9px}
+.choice{width:100%; text-align:left; padding:13px 15px; background:var(--card);
+  border:1.5px solid var(--line); color:var(--fg); font-size:.95rem; transition:.12s}
+.choice:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft)}
+.choice.ox{text-align:center; font-size:1.15rem; font-weight:700; padding:16px}
+.choice.correct{border-color:var(--ok); background:var(--ok-soft); color:var(--ok)}
+.choice.wrong{border-color:var(--ng); background:var(--ng-soft); color:var(--ng)}
+.ox-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+
+.verdict{margin-top:18px; padding:14px 16px; border-radius:12px; border:1px solid var(--line)}
+.verdict.y{background:var(--ok-soft); border-color:var(--ok)}
+.verdict.n{background:var(--ng-soft); border-color:var(--ng)}
+.verdict h3{margin:0 0 6px; font-size:.92rem}
+.verdict.y h3{color:var(--ok)} .verdict.n h3{color:var(--ng)}
+.verdict p{margin:0; font-size:.88rem}
+
+/* result */
+.score{text-align:center; padding:8px 0 18px}
+.score b{font-size:3rem; font-weight:800; font-variant-numeric:tabular-nums}
+.score b small{font-size:1.2rem; font-weight:600; color:var(--sub)}
+.score p{margin:2px 0 0; color:var(--sub); font-size:.86rem}
+.review{border-top:1px solid var(--line); padding:14px 0}
+.review:last-child{padding-bottom:0}
+.review .h{display:flex; gap:9px; align-items:flex-start; font-size:.9rem}
+.mark{flex:none; width:22px; height:22px; border-radius:50%; display:grid; place-items:center;
+  font-size:.75rem; font-weight:800; color:#fff; margin-top:3px}
+.mark.y{background:var(--ok)} .mark.n{background:var(--ng)}
+.review .exp{margin:8px 0 0 31px; font-size:.82rem; color:var(--sub)}
+
+/* stats */
+.secbar{margin-bottom:13px}
+.secbar .lb{display:flex; justify-content:space-between; font-size:.8rem; margin-bottom:5px}
+.secbar .lb span:last-child{color:var(--sub); font-variant-numeric:tabular-nums}
+.track{height:8px; background:var(--line); border-radius:99px; overflow:hidden}
+.track i{display:block; height:100%; border-radius:99px}
+.hist{display:flex; align-items:flex-end; gap:4px; height:90px; margin:6px 0 4px}
+.hist div{flex:1; background:var(--accent); border-radius:3px 3px 0 0; min-height:2px; position:relative}
+.hist div.empty{background:var(--line)}
+.histlb{display:flex; justify-content:space-between; font-size:.68rem; color:var(--sub)}
+table.weak{width:100%; border-collapse:collapse; font-size:.83rem}
+table.weak td{padding:8px 4px; border-bottom:1px solid var(--line); vertical-align:top}
+table.weak td:last-child{text-align:right; white-space:nowrap; color:var(--ng); font-weight:700}
+.empty-note{color:var(--sub); font-size:.85rem; margin:0}
+
+nav.tabs{display:flex; gap:6px; margin-bottom:14px; background:var(--card);
+  border:1px solid var(--line); border-radius:12px; padding:5px}
+nav.tabs button{flex:1; padding:9px; background:transparent; color:var(--sub); font-size:.86rem; font-weight:600}
+nav.tabs button.on{background:var(--accent-soft); color:var(--accent)}
+.hide{display:none}
+footer{text-align:center; font-size:.72rem; color:var(--sub); padding:18px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="app">
+  <div>
+    <h1>貿易実務検定 第1章 ミニテスト</h1>
+    <p class="sub">海上貨物輸送 ／ 船荷証券・海上運賃・インコタームズ2020</p>
+  </div>
+  <div class="badge" id="streakBadge">連続 0 日</div>
+</header>
+
+<nav class="tabs">
+  <button id="tabHome" class="on" onclick="go('home')">今日の10問</button>
+  <button id="tabStats" onclick="go('stats')">成績</button>
+</nav>
+
+<!-- ================= HOME ================= -->
+<section id="viewHome">
+  <div class="stat-row">
+    <div class="stat"><b id="sToday">–</b><span>今日の正解</span></div>
+    <div class="stat"><b id="sTotal">0</b><span>累計回答</span></div>
+    <div class="stat"><b id="sRate">–</b><span>通算正答率</span></div>
+  </div>
+
+  <div class="card">
+    <h2 id="homeTitle">今日のミニテスト</h2>
+    <p class="lead" id="homeLead">–</p>
+    <button class="btn" id="btnStart" onclick="startDaily()">はじめる</button>
+    <button class="btn sec" id="btnReview" onclick="startReview()">まちがえた問題を復習する</button>
+  </div>
+
+  <div class="card">
+    <h2>使い方</h2>
+    <p class="lead" style="margin-bottom:0">
+      毎日、全<span id="poolCount">–</span>問のプールから自動で10問が選ばれます。日付が変われば自動的に新しい10問に切り替わり、
+      <b>間違えた問題ほど優先的に</b>再出題されます。回答記録はこの端末のブラウザに保存されます。
+    </p>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section id="viewQuiz" class="hide">
+  <div class="progress">
+    <span id="qCount">1 / 10</span>
+    <div class="bar"><i id="qBar" style="width:0%"></i></div>
+    <span id="qScore">0問正解</span>
+  </div>
+  <div class="card">
+    <span class="tag" id="qTag">1-1</span>
+    <p class="qtext" id="qText"></p>
+    <div class="choices" id="qChoices"></div>
+    <div id="qVerdict"></div>
+    <button class="btn hide" id="btnNext" style="margin-top:16px" onclick="nextQ()">次の問題へ</button>
+  </div>
+  <button class="btn ghost" onclick="abortQuiz()">中断してもどる</button>
+</section>
+
+<!-- ================= RESULT ================= -->
+<section id="viewResult" class="hide">
+  <div class="card">
+    <div class="score">
+      <b id="rScore">0<small> / 10</small></b>
+      <p id="rComment"></p>
+    </div>
+    <button class="btn sec" onclick="go('home')">ホームにもどる</button>
+  </div>
+  <div class="card">
+    <h2>解答と解説</h2>
+    <p class="lead">まちがえた問題は、明日以降のテストで優先的に再出題されます。</p>
+    <div id="rList"></div>
+  </div>
+</section>
+
+<!-- ================= STATS ================= -->
+<section id="viewStats" class="hide">
+  <div class="stat-row">
+    <div class="stat"><b id="tStreak">0</b><span>連続日数</span></div>
+    <div class="stat"><b id="tDays">0</b><span>実施日数</span></div>
+    <div class="stat"><b id="tCovered">0%</b><span>プール網羅率</span></div>
+  </div>
+
+  <div class="card">
+    <h2>分野別の正答率</h2>
+    <p class="lead">回答したことのある問題のみ集計します。</p>
+    <div id="secList"></div>
+  </div>
+
+  <div class="card">
+    <h2>直近14日の得点</h2>
+    <div class="hist" id="histBars"></div>
+    <div class="histlb"><span id="histFrom"></span><span id="histTo">今日</span></div>
+  </div>
+
+  <div class="card">
+    <h2>苦手な問題 ワースト10</h2>
+    <div id="weakList"></div>
+  </div>
+
+  <div class="card">
+    <h2>データ管理</h2>
+    <p class="lead">記録はこのブラウザ内（localStorage）にのみ保存されます。</p>
+    <button class="btn ghost" onclick="exportData()">記録をJSONで書き出す</button>
+    <button class="btn ghost" onclick="resetData()" style="color:var(--ng)">記録をすべて消去する</button>
+  </div>
+</section>
+
+<footer>出典：貿易実務検定テキスト 第1章「海上貨物輸送」／学習用に作成</footer>
+</div>
+
+<script src="questions.js"></script>
+<script>
+/* ================= storage ================= */
+const KEY = "boueki_ch1_v1";
+const PER_DAY = 10;
+let S = load();
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return {days:{}, stats:{}};
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+function todayKey(d){
+  d = d || new Date();
+  const p = n => String(n).padStart(2,"0");
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());
+}
+function jpDate(k){
+  const [y,m,d] = k.split("-").map(Number);
+  const w = "日月火水木金土"[new Date(y,m-1,d).getDay()];
+  return `${y}年${m}月${d}日（${w}）`;
+}
+
+/* ================= seeded RNG ================= */
+function hash(str){
+  let h = 2166136261;
+  for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h,16777619); }
+  return h>>>0;
+}
+function rng(seed){
+  let a = seed>>>0;
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a>>>15, 1 | a);
+    t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t;
+    return ((t ^ t>>>14)>>>0) / 4294967296;
+  };
+}
+function shuffle(arr, rand){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(rand()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+/* ================= question selection ================= */
+function st(id){ return S.stats[id] || {seen:0, ok:0, ng:0, lastWrong:null}; }
+
+function pickDaily(dayKey){
+  const rand = rng(hash(dayKey + "|ch1"));
+  const all = QUESTIONS.map(q=>q.id);
+
+  // 1) 直近まちがえた問題（最大4問）
+  const weak = all.filter(id=>{ const s=st(id); return s.ng>0 && s.ng>=s.ok; });
+  // 2) 一度も出ていない問題
+  const fresh = all.filter(id=> st(id).seen===0 );
+  // 3) その他（出題回数の少ない順）
+  const rest = all.filter(id=> !weak.includes(id) && !fresh.includes(id) )
+                  .sort((a,b)=> st(a).seen - st(b).seen);
+
+  const out = [];
+  const push = arr => { for(const id of arr){ if(out.length>=PER_DAY) break; if(!out.includes(id)) out.push(id); } };
+
+  push(shuffle(weak, rand).slice(0, Math.min(4, weak.length)));
+  push(shuffle(fresh, rand));
+  push(shuffle(rest.slice(0, Math.max(PER_DAY*3, 30)), rand));
+  push(shuffle(all, rand));
+
+  return shuffle(out.slice(0,PER_DAY), rand);
+}
+
+function getDay(dayKey){
+  if(!S.days[dayKey]){
+    S.days[dayKey] = { ids: pickDaily(dayKey), answers:{}, done:false };
+    save();
+  }
+  return S.days[dayKey];
+}
+function qById(id){ return QUESTIONS.find(q=>q.id===id); }
+
+/* ================= streak ================= */
+function streak(){
+  let n = 0;
+  const d = new Date();
+  // 今日が未完了なら昨日から数える
+  if(!(S.days[todayKey(d)] && S.days[todayKey(d)].done)) d.setDate(d.getDate()-1);
+  while(true){
+    const k = todayKey(d);
+    if(S.days[k] && S.days[k].done){ n++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return n;
+}
+
+/* ================= views ================= */
+let VIEW = "home";
+function go(v){
+  VIEW = v;
+  for(const id of ["Home","Quiz","Result","Stats"])
+    document.getElementById("view"+id).classList.add("hide");
+  document.getElementById("viewHome").classList.toggle("hide", v!=="home");
+  document.getElementById("viewQuiz").classList.toggle("hide", v!=="quiz");
+  document.getElementById("viewResult").classList.toggle("hide", v!=="result");
+  document.getElementById("viewStats").classList.toggle("hide", v!=="stats");
+  document.getElementById("tabHome").classList.toggle("on", v==="home"||v==="quiz"||v==="result");
+  document.getElementById("tabStats").classList.toggle("on", v==="stats");
+  if(v==="home") renderHome();
+  if(v==="stats") renderStats();
+  window.scrollTo(0,0);
+}
+
+function renderHome(){
+  const k = todayKey();
+  const day = getDay(k);
+  const answered = Object.keys(day.answers).length;
+  const correct = Object.values(day.answers).filter(Boolean).length;
+
+  document.getElementById("poolCount").textContent = QUESTIONS.length;
+  document.getElementById("streakBadge").textContent = "連続 " + streak() + " 日";
+  document.getElementById("sToday").textContent = answered ? correct + "/" + answered : "–";
+
+  let tot=0, ok=0;
+  for(const id in S.stats){ tot += S.stats[id].seen; ok += S.stats[id].ok; }
+  document.getElementById("sTotal").textContent = tot;
+  document.getElementById("sRate").textContent = tot ? Math.round(ok/tot*100)+"%" : "–";
+
+  const btn = document.getElementById("btnStart");
+  document.getElementById("homeTitle").textContent = jpDate(k) + " のミニテスト";
+  if(day.done){
+    document.getElementById("homeLead").textContent =
+      `本日は完了しています（${correct} / ${PER_DAY}問正解）。明日また新しい10問が出題されます。`;
+    btn.textContent = "今日の結果をもう一度見る";
+    btn.onclick = () => showResult(k);
+  }else if(answered>0){
+    document.getElementById("homeLead").textContent = `${answered}問まで回答済みです。続きから再開できます。`;
+    btn.textContent = "続きから再開する";
+    btn.onclick = startDaily;
+  }else{
+    document.getElementById("homeLead").textContent = `全${QUESTIONS.length}問のプールから選ばれた10問です。〇× と 4択が混ざります。`;
+    btn.textContent = "はじめる";
+    btn.onclick = startDaily;
+  }
+
+  const wrongIds = QUESTIONS.map(q=>q.id).filter(id=>{ const s=st(id); return s.ng>0; });
+  const rv = document.getElementById("btnReview");
+  rv.disabled = wrongIds.length===0;
+  rv.textContent = wrongIds.length ? `まちがえた問題を復習する（${wrongIds.length}問）` : "まちがえた問題はまだありません";
+}
+
+/* ================= quiz engine ================= */
+let Q = null; // {ids, idx, mode:'daily'|'review', dayKey, log:[]}
+
+function startDaily(){
+  const k = todayKey();
+  const day = getDay(k);
+  const remaining = day.ids.filter(id => !(id in day.answers));
+  if(remaining.length===0){ showResult(k); return; }
+  Q = { ids: day.ids, idx: day.ids.length - remaining.length, mode:"daily", dayKey:k, log:[] };
+  // 再開時は既回答分をログに復元
+  for(const id of day.ids){ if(id in day.answers) Q.log.push({id, ok:day.answers[id]}); }
+  go("quiz"); renderQ();
+}
+
+function startReview(){
+  const rand = rng(hash(Date.now()+"r"));
+  let ids = QUESTIONS.map(q=>q.id).filter(id=> st(id).ng>0 );
+  ids.sort((a,b)=> (st(b).ng-st(b).ok) - (st(a).ng-st(a).ok) );
+  ids = shuffle(ids.slice(0, 20), rand).slice(0, PER_DAY);
+  if(!ids.length) return;
+  Q = { ids, idx:0, mode:"review", dayKey:null, log:[] };
+  go("quiz"); renderQ();
+}
+
+function abortQuiz(){ Q=null; go("home"); }
+
+function renderQ(){
+  const q = qById(Q.ids[Q.idx]);
+  const n = Q.ids.length;
+  document.getElementById("qCount").textContent = (Q.idx+1) + " / " + n;
+  document.getElementById("qBar").style.width = (Q.idx/n*100) + "%";
+  const okc = Q.log.filter(l=>l.ok).length;
+  document.getElementById("qScore").textContent = okc + "問正解";
+  document.getElementById("qTag").textContent = q.sec + "　" + SECTIONS[q.sec];
+  document.getElementById("qText").textContent = (Q.mode==="review"?"【復習】":"") + q.q;
+  document.getElementById("qVerdict").innerHTML = "";
+  document.getElementById("btnNext").classList.add("hide");
+
+  const box = document.getElementById("qChoices");
+  box.innerHTML = "";
+  if(q.type==="ox"){
+    box.className = "choices ox-grid";
+    [["○", true],["×", false]].forEach(([lb,val])=>{
+      const b = document.createElement("button");
+      b.className = "choice ox"; b.textContent = lb;
+      b.onclick = () => answer(val === q.a, val, q);
+      box.appendChild(b);
+    });
+  }else{
+    box.className = "choices";
+    q.choices.forEach((c,i)=>{
+      const b = document.createElement("button");
+      b.className = "choice";
+      b.textContent = "　" + "①②③④⑤"[i] + "　" + c;
+      b.onclick = () => answer(i === q.a, i, q);
+      box.appendChild(b);
+    });
+  }
+}
+
+function answer(isOk, chosen, q){
+  // ボタンを固定して正誤を着色
+  const btns = [...document.getElementById("qChoices").children];
+  btns.forEach((b,i)=>{
+    b.disabled = true;
+    const val = (q.type==="ox") ? (i===0) : i;
+    const isCorrectChoice = (q.type==="ox") ? (val===q.a) : (i===q.a);
+    if(isCorrectChoice) b.classList.add("correct");
+    else if(val===chosen || (q.type!=="ox" && i===chosen)) b.classList.add("wrong");
+  });
+
+  // 統計を更新
+  const s = st(q.id);
+  s.seen++; isOk ? s.ok++ : s.ng++;
+  if(!isOk) s.lastWrong = todayKey();
+  S.stats[q.id] = s;
+  if(Q.mode==="daily"){
+    const day = getDay(Q.dayKey);
+    day.answers[q.id] = isOk;
+  }
+  Q.log.push({id:q.id, ok:isOk});
+  save();
+
+  const v = document.getElementById("qVerdict");
+  v.innerHTML = `<div class="verdict ${isOk?'y':'n'}">
+      <h3>${isOk?"正解":"不正解"}</h3><p>${esc(q.exp)}</p></div>`;
+  const nx = document.getElementById("btnNext");
+  nx.classList.remove("hide");
+  nx.textContent = (Q.idx+1 >= Q.ids.length) ? "結果を見る" : "次の問題へ";
+  document.getElementById("qScore").textContent = Q.log.filter(l=>l.ok).length + "問正解";
+}
+
+function nextQ(){
+  Q.idx++;
+  if(Q.idx >= Q.ids.length){
+    if(Q.mode==="daily"){
+      const day = getDay(Q.dayKey);
+      day.done = true; save();
+      showResult(Q.dayKey);
+    }else{
+      showResultFromLog(Q.log, "復習モード");
+    }
+    return;
+  }
+  renderQ();
+}
+
+/* ================= result ================= */
+function showResult(dayKey){
+  const day = S.days[dayKey];
+  const log = day.ids.filter(id=> id in day.answers).map(id=>({id, ok:day.answers[id]}));
+  showResultFromLog(log, jpDate(dayKey));
+}
+
+function showResultFromLog(log, label){
+  const ok = log.filter(l=>l.ok).length;
+  const n = log.length;
+  document.getElementById("rScore").innerHTML = ok + `<small> / ${n}</small>`;
+  const pct = n ? ok/n : 0;
+  let c;
+  if(pct===1) c = "全問正解です。文句なしの仕上がりです。";
+  else if(pct>=0.8) c = "よくできています。まちがえた論点だけ押さえれば万全です。";
+  else if(pct>=0.6) c = "あと一歩。解説を読んで、明日の再出題で確実にしましょう。";
+  else c = "ここが伸びしろです。該当の節をテキストで読み直してから復習モードへ。";
+  document.getElementById("rComment").textContent = label + "　" + c;
+
+  document.getElementById("rList").innerHTML = log.map((l,i)=>{
+    const q = qById(l.id);
+    let ans;
+    if(q.type==="ox") ans = q.a ? "○" : "×";
+    else ans = "①②③④⑤"[q.a] + " " + q.choices[q.a];
+    return `<div class="review">
+      <div class="h">
+        <span class="mark ${l.ok?'y':'n'}">${l.ok?'✓':'✕'}</span>
+        <span><b style="color:var(--sub);font-size:.78rem">Q${i+1}・${q.sec}</b><br>${esc(q.q)}</span>
+      </div>
+      <p class="exp"><b>答：${esc(ans)}</b><br>${esc(q.exp)}</p>
+    </div>`;
+  }).join("");
+  go("result");
+}
+
+/* ================= stats ================= */
+function renderStats(){
+  document.getElementById("tStreak").textContent = streak();
+  const doneDays = Object.keys(S.days).filter(k=>S.days[k].done);
+  document.getElementById("tDays").textContent = doneDays.length;
+  const covered = QUESTIONS.filter(q=> st(q.id).seen>0 ).length;
+  document.getElementById("tCovered").textContent = Math.round(covered/QUESTIONS.length*100) + "%";
+
+  // 分野別
+  const agg = {};
+  for(const q of QUESTIONS){
+    const s = st(q.id);
+    if(!agg[q.sec]) agg[q.sec] = {ok:0, n:0};
+    agg[q.sec].ok += s.ok; agg[q.sec].n += s.seen;
+  }
+  document.getElementById("secList").innerHTML = Object.keys(SECTIONS).map(k=>{
+    const a = agg[k] || {ok:0,n:0};
+    const p = a.n ? Math.round(a.ok/a.n*100) : 0;
+    const col = !a.n ? "var(--line)" : p>=80 ? "var(--ok)" : p>=60 ? "var(--warn)" : "var(--ng)";
+    return `<div class="secbar">
+      <div class="lb"><span>${k}　${SECTIONS[k]}</span><span>${a.n? p+"%（"+a.ok+"/"+a.n+"）" : "未回答"}</span></div>
+      <div class="track"><i style="width:${a.n?p:0}%;background:${col}"></i></div>
+    </div>`;
+  }).join("");
+
+  // 直近14日
+  const bars = [];
+  const d = new Date();
+  d.setDate(d.getDate()-13);
+  let fromLabel = "";
+  for(let i=0;i<14;i++){
+    const k = todayKey(d);
+    if(i===0) fromLabel = (d.getMonth()+1)+"/"+d.getDate();
+    const day = S.days[k];
+    const ok = day ? Object.values(day.answers).filter(Boolean).length : 0;
+    const has = day && Object.keys(day.answers).length>0;
+    bars.push(`<div class="${has?'':'empty'}" style="height:${has? Math.max(6, ok/PER_DAY*100) : 4}%" title="${k}　${ok}/${PER_DAY}"></div>`);
+    d.setDate(d.getDate()+1);
+  }
+  document.getElementById("histBars").innerHTML = bars.join("");
+  document.getElementById("histFrom").textContent = fromLabel;
+
+  // 苦手
+  const weak = QUESTIONS.map(q=>({q, s:st(q.id)}))
+    .filter(x=> x.s.ng>0 )
+    .sort((a,b)=> (b.s.ng - b.s.ok) - (a.s.ng - a.s.ok) || b.s.ng - a.s.ng)
+    .slice(0,10);
+  document.getElementById("weakList").innerHTML = weak.length
+    ? `<table class="weak">${weak.map(x=>
+        `<tr><td><b style="color:var(--sub);font-size:.75rem">${x.q.sec}</b><br>${esc(x.q.q.slice(0,58))}${x.q.q.length>58?"…":""}</td>
+             <td>${x.s.ng}回<br><span style="color:var(--sub);font-weight:400">/${x.s.seen}回</span></td></tr>`).join("")}</table>`
+    : `<p class="empty-note">まだまちがえた問題はありません。</p>`;
+}
+
+/* ================= data ================= */
+function exportData(){
+  const blob = new Blob([JSON.stringify(S,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "貿易実務第1章_学習記録_" + todayKey() + ".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function resetData(){
+  if(!confirm("これまでの学習記録をすべて消去します。よろしいですか？")) return;
+  S = {days:{}, stats:{}};
+  save();
+  renderStats(); renderHome();
+  alert("記録を消去しました。");
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+}
+
+/* ================= init ================= */
+go("home");
+</script>
+</body>
+</html>
