@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>お部屋リフォーム 見積もりシミュレーター</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+:root{
+  --ink:#1E2430; --sub:#6B7280; --line:#E8EAEE; --bg:#F7F8FA;
+  --accent:#FF7A3D; --accent2:#17B3A6; --accent-soft:#FFF3EC;
+  --ease:cubic-bezier(.22,.9,.25,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Hiragino Sans","Yu Gothic UI","Yu Gothic",system-ui,sans-serif;
+  color:var(--ink); background:var(--bg); font-size:18px; line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1360px;margin:0 auto;padding:0 28px 72px}
+
+/* ---------- header ---------- */
+header{padding:44px 0 28px;border-bottom:1px solid var(--line);margin-bottom:48px}
+.badge{display:inline-block;padding:4px 16px;border-radius:999px;background:var(--accent-soft);
+  color:var(--accent);font-size:15px;font-weight:700;letter-spacing:.04em}
+h1{font-size:36px;line-height:1.4;font-weight:800;margin:16px 0 10px;letter-spacing:.01em}
+.lead{color:var(--sub);font-size:17px}
+
+/* ---------- layout ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+@media(max-width:1080px){.split{grid-template-columns:1fr}}
+
+/* ---------- left / questions ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px;
+  box-shadow:0 2px 12px rgba(0,0,0,.05);margin-bottom:28px}
+.qnum{font-size:14px;color:var(--accent2);font-weight:800;letter-spacing:.12em}
+.qtitle{font-size:21px;font-weight:800;margin:4px 0 20px}
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;
+  font-size:18px;font-family:inherit;color:var(--ink);
+  transition:border-color .25s var(--ease),background .25s var(--ease),transform .25s var(--ease)}
+.opt:hover{transform:translateY(-2px)}
+.opt .dot{width:16px;height:16px;border-radius:999px;border:2px solid var(--line);flex:none;
+  transition:all .25s var(--ease)}
+.opt.on{border-color:var(--accent);background:var(--accent-soft)}
+.opt.on .dot{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px #fff}
+.opt .note{margin-left:auto;font-size:15px;color:var(--sub)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.grid2{grid-template-columns:1fr}}
+.slider{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;
+  background:linear-gradient(90deg,var(--accent) var(--p,50%),var(--line) var(--p,50%));outline:none;margin:10px 0 4px}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:999px;
+  background:#fff;border:3px solid var(--accent);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.slider::-moz-range-thumb{width:26px;height:26px;border-radius:999px;background:#fff;
+  border:3px solid var(--accent);cursor:pointer}
+.sliderval{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+.hint{font-size:15px;color:var(--sub)}
+.appear{animation:fadeUp .32s var(--ease) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- right / A4 sheet ---------- */
+.sheet{background:#fff;border:1px solid var(--line);border-radius:20px;
+  box-shadow:0 2px 12px rgba(0,0,0,.05);padding:40px 42px;position:sticky;top:24px}
+.sheet h2{font-size:26px;font-weight:800;letter-spacing:.3em;text-align:center;margin-bottom:6px}
+.meta{display:flex;justify-content:space-between;font-size:15px;color:var(--sub);
+  border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:24px}
+.parties{display:grid;grid-template-columns:minmax(220px,1fr) minmax(240px,1fr);gap:32px;margin-bottom:28px}
+@media(max-width:520px){.parties{grid-template-columns:1fr}}
+.party p{font-size:16px;line-height:1.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.party .to{font-size:20px;font-weight:800;border-bottom:1px solid var(--ink);
+  display:inline-block;padding-bottom:4px;margin-bottom:10px;white-space:nowrap}
+.party .cname{font-weight:800;font-size:17px}
+table{width:100%;border-collapse:collapse;margin-bottom:20px}
+th{font-size:14px;color:var(--sub);font-weight:700;text-align:left;
+  border-bottom:1px solid var(--ink);padding:8px 6px}
+th.r,td.r{text-align:right}
+td{font-size:16px;padding:11px 6px;border-bottom:1px solid var(--line);
+  font-variant-numeric:tabular-nums;vertical-align:top}
+td.name{line-height:1.6}
+tr.row{animation:fadeUp .32s var(--ease) both}
+tr.flash td{animation:hl .9s var(--ease)}
+@keyframes hl{0%{background:#FFE9DC}70%{background:#FFF6F0}100%{background:transparent}}
+.disc td{color:var(--accent2);font-weight:700}
+.sums{margin-left:auto;width:min(340px,100%)}
+.sumrow{display:flex;justify-content:space-between;font-size:16px;padding:6px 0;
+  font-variant-numeric:tabular-nums;color:var(--sub)}
+.total{display:flex;justify-content:space-between;align-items:baseline;
+  border-top:2px solid var(--ink);margin-top:10px;padding-top:14px}
+.total .lb{font-size:17px;font-weight:800}
+.total .v{font-size:44px;font-weight:800;letter-spacing:-.01em;font-variant-numeric:tabular-nums;color:var(--accent)}
+.total .v small{font-size:20px;margin-left:4px;color:var(--ink)}
+.remark{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:15px;color:var(--sub);line-height:1.9}
+
+/* ---------- print button ---------- */
+.actions{margin-top:28px;text-align:center}
+.pbtn{font-family:inherit;font-size:19px;font-weight:800;color:#fff;background:var(--accent);
+  border:none;border-radius:14px;padding:18px 40px;cursor:pointer;
+  box-shadow:0 6px 20px rgba(255,122,61,.32);transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.pbtn:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(255,122,61,.4)}
+.pnote{font-size:14px;color:var(--sub);margin-top:12px}
+
+/* ---------- print ---------- */
+@page{size:A4;margin:14mm}
+@media print{
+  body{background:#fff;font-size:13px}
+  .wrap{max-width:none;padding:0}
+  header,.left,.actions,.noprint{display:none !important}
+  .split{display:block}
+  .sheet{border:none;box-shadow:none;border-radius:0;padding:0;position:static}
+  .sheet h2{font-size:20px}
+  td{font-size:12.5px;padding:6px 4px}
+  .party p{font-size:12px}
+  .total .v{font-size:28px}
+  tr.row,.appear{animation:none !important}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const {useState,useEffect,useRef} = React;
+const yen = n => Math.round(n).toLocaleString('ja-JP');
+
+/* ---------- マスタ ---------- */
+const PLANS = {
+  ume:{name:'梅プラン（お手軽リフレッシュ）',mul:1.0,unit:8000,
+    base:[['クロス（壁紙）張替え 一式',48000],['既存設備クリーニング',26000]]},
+  take:{name:'竹プラン（まるごと快適）',mul:1.35,unit:12000,
+    base:[['クロス（壁紙）張替え 一式',48000],['フローリング上張り工事',92000],['照明・スイッチ交換',36000],['既存設備クリーニング',26000]]},
+  matsu:{name:'松プラン（フルリノベ）',mul:1.8,unit:18000,
+    base:[['デザインクロス張替え 一式',78000],['無垢フローリング張替え',168000],['造作収納 製作・取付',145000],['照明・スイッチ交換',36000],['内装デザイン設計費',120000]]}
+};
+const ROOMS = {
+  living:['リビング',120000],kitchen:['キッチン',180000],
+  bath:['浴室・洗面',220000],bed:['寝室・洋室',90000]
+};
+const OPTIONS = {
+  eco:['断熱・内窓の取付',86000], aircon:['エアコン新規設置',64000],
+  paint:['造作棚のオイル塗装仕上げ',38000], clean:['引渡し前ハウスクリーニング',24000]
+};
+const RUSH = {no:['通常（1〜2ヶ月）',0], w2:['2週間以内に完了',0.30], m1:['1ヶ月以内に完了',0.15]};
+const DOOR_UNIT = 22000;
+
+/* ---------- 計算（条件分岐の本体） ---------- */
+function calc(s){
+  const p = PLANS[s.plan], rooms = ROOMS[s.room];
+  const items = [];
+  items.push({k:'base',name:rooms[0]+'リフォーム 基本工事費（'+p.name+'）',qty:1,unit:Math.round(rooms[1]*p.mul),amt:Math.round(rooms[1]*p.mul)});
+  items.push({k:'area',name:'内装施工費（'+s.area+'畳 × '+yen(p.unit)+'円）',qty:s.area,unit:p.unit,amt:p.unit*s.area});
+  p.base.forEach(([nm,pr],i)=>{
+    const a = Math.round(pr*(0.9+p.mul*0.1));
+    items.push({k:'p'+i,name:nm,qty:1,unit:a,amt:a});
+  });
+  Object.keys(OPTIONS).forEach(k=>{ if(s.opts[k]) items.push({k:'o'+k,name:OPTIONS[k][0],qty:1,unit:OPTIONS[k][1],amt:OPTIONS[k][1]}); });
+
+  // ② 数量による段階割引（建具10枚以上で10%オフ）
+  let bulk = 0;
+  if(s.doors>0){
+    const doorAmt = DOOR_UNIT*s.doors;
+    items.push({k:'door',name:'室内ドア・建具の交換',qty:s.doors,unit:DOOR_UNIT,amt:doorAmt});
+    if(s.doors>=10){ bulk = Math.round(doorAmt*0.10);
+      items.push({k:'bulk',disc:true,name:'⭐ まとめ割 適用中（建具10枚以上で 10%OFF）',qty:1,unit:-bulk,amt:-bulk}); }
+  }
+  const sub = items.reduce((a,b)=>a+b.amt,0);
+  // ① 前の答えで増える質問 → 特急料金
+  const rushRate = RUSH[s.rush][1];
+  const rush = Math.round(sub*rushRate);
+  if(rush>0) items.push({k:'rush',name:'特急対応費（'+RUSH[s.rush][0]+'）',qty:1,unit:rush,amt:rush});
+  const total = sub+rush, tax = Math.round(total*0.1);
+  return {items,sub,rush,rushRate,bulk,total,tax,grand:total+tax};
+}
+
+/* ---------- 小物 ---------- */
+function Opt({on,label,note,onClick}){
+  return <button className={'opt'+(on?' on':'')} onClick={onClick}>
+    <span className="dot"></span><span>{label}</span>{note&&<span className="note">{note}</span>}</button>;
+}
+function CountUp({value}){
+  const [d,setD] = useState(value); const ref = useRef(value);
+  useEffect(()=>{
+    const from = ref.current, to = value, t0 = performance.now();
+    let id; const step = t => { const k = Math.min((t-t0)/400,1);
+      const e = 1-Math.pow(1-k,3); setD(from+(to-from)*e);
+      if(k<1) id = requestAnimationFrame(step); else ref.current = to; };
+    id = requestAnimationFrame(step); return ()=>cancelAnimationFrame(id);
+  },[value]);
+  return <span>¥{yen(d)}</span>;
+}
+
+/* ---------- 本体 ---------- */
+function App(){
+  const [s,setS] = useState({plan:'take',room:'living',area:12,
+    opts:{eco:true,aircon:false,paint:false,clean:true},rush:'no',doors:4,cust:'田中 太郎'});
+  const set = (k,v)=>setS(o=>({...o,[k]:v}));
+  const toggle = k => setS(o=>({...o,opts:{...o.opts,[k]:!o.opts[k]}}));
+  const r = calc(s);
+
+  // 変更行のハイライト
+  const prev = useRef({}); const [flash,setFlash] = useState({});
+  useEffect(()=>{
+    const now = {}; r.items.forEach(i=>now[i.k]=i.amt);
+    const f = {}; Object.keys(now).forEach(k=>{ if(prev.current[k]!==now[k]) f[k]=1; });
+    prev.current = now; setFlash(f);
+  },[JSON.stringify(r.items)]);
+
+  const no = 'RF-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+String(new Date().getSeconds()*7+101).padStart(3,'0');
+  const today = new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'});
+  const limit = new Date(Date.now()+30*864e5).toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'});
+
+  return <div className="wrap">
+    <header>
+      <span className="badge">お部屋リフォーム</span>
+      <h1>その場でわかる、リフォーム見積もりシミュレーター</h1>
+      <p className="lead">左で選ぶだけ。右の見積書がリアルタイムで書き換わります。</p>
+    </header>
+
+    <div className="split">
+      {/* ===== 左：質問コーナー ===== */}
+      <div className="left">
+        <div className="card">
+          <div className="qnum">Q1</div><div className="qtitle">ご希望のプランは？</div>
+          <div className="opts">
+            {[['ume','梅｜お手軽リフレッシュ'],['take','竹｜まるごと快適（人気）'],['matsu','松｜フルリノベーション']].map(([k,l])=>
+              <Opt key={k} on={s.plan===k} label={l} onClick={()=>set('plan',k)}/>)}
+          </div>
+          <p className="hint" style={{marginTop:12}}>プランを変えると、見積書の品目リストごと入れ替わります。</p>
+        </div>
+
+        <div className="card">
+          <div className="qnum">Q2</div><div className="qtitle">どのお部屋をリフォームしますか？</div>
+          <div className="grid2">
+            {Object.entries(ROOMS).map(([k,v])=>
+              <Opt key={k} on={s.room===k} label={v[0]} onClick={()=>set('room',k)}/>)}
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="qnum">Q3</div><div className="qtitle">お部屋の広さは？</div>
+          <div className="sliderval">{s.area} 畳</div>
+          <input className="slider" type="range" min="4" max="30" value={s.area}
+            style={{'--p':((s.area-4)/26*100)+'%'}}
+            onChange={e=>set('area',+e.target.value)}/>
+          <p className="hint">4畳 〜 30畳</p>
+        </div>
+
+        <div className="card">
+          <div className="qnum">Q4</div><div className="qtitle">室内ドア・建具は何枚交換しますか？</div>
+          <div className="sliderval">{s.doors} 枚</div>
+          <input className="slider" type="range" min="0" max="20" value={s.doors}
+            style={{'--p':(s.doors/20*100)+'%'}}
+            onChange={e=>set('doors',+e.target.value)}/>
+          <p className="hint">{s.doors>=10
+            ? '⭐ 10枚以上なので「まとめ割 10%OFF」が適用されています！'
+            : 'あと '+(10-s.doors)+' 枚で「まとめ割 10%OFF」が適用されます。'}</p>
+        </div>
+
+        <div className="card">
+          <div className="qnum">Q5</div><div className="qtitle">追加したいオプションは？（複数可）</div>
+          <div className="opts">
+            {Object.entries(OPTIONS).map(([k,v])=>
+              <Opt key={k} on={s.opts[k]} label={v[0]} note={'+¥'+yen(v[1])} onClick={()=>toggle(k)}/>)}
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="qnum">Q6</div><div className="qtitle">工期はお急ぎですか？</div>
+          <div className="opts">
+            <Opt on={s.rush!=='no'} label="はい、急いでいます" onClick={()=>set('rush', s.rush==='no'?'m1':s.rush)}/>
+            <Opt on={s.rush==='no'} label="いいえ、通常でかまいません" onClick={()=>set('rush','no')}/>
+          </div>
+          {s.rush!=='no' &&
+            <div className="appear" style={{marginTop:20,paddingTop:20,borderTop:'1px solid var(--line)'}}>
+              <div className="qnum">Q6-2</div><div className="qtitle">いつまでに完了させますか？</div>
+              <div className="opts">
+                <Opt on={s.rush==='w2'} label="2週間以内" note="特急料金 +30%" onClick={()=>set('rush','w2')}/>
+                <Opt on={s.rush==='m1'} label="1ヶ月以内" note="特急料金 +15%" onClick={()=>set('rush','m1')}/>
+              </div>
+            </div>}
+        </div>
+
+        <div className="card">
+          <div className="qnum">Q7</div><div className="qtitle">お名前（見積書の宛名になります）</div>
+          <input value={s.cust} onChange={e=>set('cust',e.target.value)}
+            style={{width:'100%',fontFamily:'inherit',fontSize:18,padding:'14px 18px',
+              border:'1px solid var(--line)',borderRadius:14,color:'var(--ink)'}}/>
+        </div>
+      </div>
+
+      {/* ===== 右：A4見積書 ===== */}
+      <div>
+        <div className="sheet">
+          <h2>御見積書</h2>
+          <div className="meta"><span>見積番号：{no}</span><span>発行日：{today}</span></div>
+
+          <div className="parties">
+            <div className="party">
+              <div className="to">{(s.cust||'お客様').trim()} 様</div>
+              <p>下記のとおりお見積り申し上げます。</p>
+              <p>有効期限：{limit}</p>
+            </div>
+            <div className="party">
+              <p className="cname">株式会社ニコリフォーム</p>
+              <p>〒150-0002</p>
+              <p>東京都渋谷区渋谷 3-15-8 ニコビル 4F</p>
+              <p>TEL：03-1234-5678</p>
+              <p>Mail：info@niko-reform.example.jp</p>
+            </div>
+          </div>
+
+          <table>
+            <thead><tr>
+              <th style={{width:'52%'}}>品目・仕様</th><th className="r">数量</th>
+              <th className="r">単価</th><th className="r">金額</th>
+            </tr></thead>
+            <tbody>
+              {r.items.map(i=>
+                <tr key={i.k} className={'row'+(flash[i.k]?' flash':'')+(i.disc?' disc':'')}>
+                  <td className="name">{i.name}</td>
+                  <td className="r">{i.qty}</td>
+                  <td className="r">{i.amt<0?'－':''}{yen(Math.abs(i.unit))}</td>
+                  <td className="r">{i.amt<0?'－':''}{yen(Math.abs(i.amt))}</td>
+                </tr>)}
+            </tbody>
+          </table>
+
+          <div className="sums">
+            <div className="sumrow"><span>小計</span><span>¥{yen(r.total)}</span></div>
+            <div className="sumrow"><span>消費税（10%）</span><span>¥{yen(r.tax)}</span></div>
+            <div className="total">
+              <span className="lb">合計金額<br/><span style={{fontWeight:400,fontSize:13,color:'var(--sub)'}}>（税込）</span></span>
+              <span className="v"><CountUp value={r.grand}/><small>円</small></span>
+            </div>
+          </div>
+
+          <div className="remark">
+            ・本見積は概算です。現地調査のうえ、正式なお見積りをご提示いたします。<br/>
+            ・工事内容の変更により金額が変動する場合がございます。<br/>
+            {r.bulk>0 && <>・⭐まとめ割（建具10枚以上 10%OFF）を適用し、¥{yen(r.bulk)} 割引しております。<br/></>}
+            {r.rushRate>0 && <>・{RUSH[s.rush][0]}のため、特急対応費 {Math.round(r.rushRate*100)}% を加算しております。<br/></>}
+          </div>
+        </div>
+
+        <div className="actions">
+          <button className="pbtn" onClick={()=>window.print()}>この内容で印刷（PDF保存）</button>
+          <p className="pnote">印刷画面で「送信先／プリンター」を「PDFとして保存」（Mac：PDF ▸ PDFとして保存）にすると、そのままPDFになります。</p>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>営業職のためのAI活用タイプ診断（10問）</title>
+<style>
+:root{
+  --ink:#14181F; --sub:#667085; --line:#E6E9EF; --bg:#F6F8FB;
+  --main:#2F5BFF; --main-soft:#EEF2FF; --amber:#F5A524; --amber-soft:#FFF6E6;
+  --ease:cubic-bezier(.22,.9,.25,1);
+  --shadow:0 2px 16px rgba(20,24,31,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{
+  font-family:"Hiragino Sans","Yu Gothic UI","Yu Gothic",system-ui,sans-serif;
+  background:var(--bg); color:var(--ink); font-size:19px; line-height:1.8;
+  letter-spacing:.01em; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:760px;margin:0 auto;padding:64px 20px 80px}
+@media(max-width:600px){.wrap{padding:36px 16px 56px}}
+
+/* header */
+.badge{display:inline-block;padding:4px 16px;border-radius:999px;background:var(--main-soft);
+  color:var(--main);font-size:14px;font-weight:800;letter-spacing:.08em}
+h1{font-size:32px;line-height:1.45;font-weight:800;margin:16px 0 10px}
+.lead{color:var(--sub);font-size:17px}
+header{margin-bottom:36px}
+@media(max-width:600px){h1{font-size:25px}}
+
+/* progress */
+.prog{display:flex;align-items:center;gap:16px;margin-bottom:28px}
+.track{flex:1;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar{height:100%;width:0;border-radius:999px;background:var(--main);
+  transition:width .6s var(--ease)}
+.pct{font-size:15px;color:var(--sub);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* card */
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:36px;
+  box-shadow:var(--shadow)}
+@media(max-width:600px){.card{padding:24px}}
+.fade{animation:fadeUp .34s var(--ease) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.qno{font-size:14px;font-weight:800;letter-spacing:.12em;color:var(--main)}
+.qtext{font-size:26px;font-weight:800;line-height:1.55;margin:6px 0 26px}
+@media(max-width:600px){.qtext{font-size:21px}}
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:56px;text-align:left;
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 20px;
+  font-family:inherit;font-size:18px;line-height:1.6;color:var(--ink);cursor:pointer;
+  transition:border-color .25s var(--ease),background .25s var(--ease),transform .25s var(--ease)}
+.opt:hover{border-color:var(--main);transform:translateY(-2px)}
+.opt:focus-visible{outline:3px solid var(--main-soft);outline-offset:2px;border-color:var(--main)}
+.opt .mk{width:16px;height:16px;border-radius:999px;border:2px solid var(--line);flex:none;
+  transition:all .2s var(--ease)}
+.opt.picked{border-color:var(--main);background:var(--main-soft)}
+.opt.picked .mk{border-color:var(--main);background:var(--main);box-shadow:inset 0 0 0 3px #fff}
+
+.foot{display:flex;align-items:center;gap:16px;margin-top:26px;padding-top:20px;
+  border-top:1px solid var(--line)}
+.back{font-family:inherit;font-size:16px;color:var(--sub);background:none;border:none;
+  cursor:pointer;padding:8px 4px;border-radius:8px}
+.back:hover{color:var(--main)}
+.back[disabled]{opacity:.3;cursor:default}
+.back.fwd{margin-left:auto;color:var(--main);font-weight:800}
+.foot .tip{margin-left:auto;font-size:14px;color:var(--sub)}
+
+/* result */
+.rtag{display:inline-block;padding:4px 16px;border-radius:999px;background:var(--amber-soft);
+  color:#9A6400;font-size:14px;font-weight:800;letter-spacing:.06em}
+.rname{font-size:34px;font-weight:800;line-height:1.4;margin:14px 0 6px}
+@media(max-width:600px){.rname{font-size:26px}}
+.rsub{color:var(--sub);font-size:17px}
+.sec{margin-top:32px;padding-top:26px;border-top:1px solid var(--line)}
+.sech{font-size:15px;font-weight:800;letter-spacing:.1em;color:var(--main);margin-bottom:12px}
+.sec p{font-size:18px}
+.sec ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.sec li{font-size:18px;padding-left:26px;position:relative}
+.sec li::before{content:"";position:absolute;left:6px;top:14px;width:8px;height:8px;
+  border-radius:999px;background:var(--main)}
+.step{background:var(--amber-soft);border-radius:16px;padding:22px 24px;font-size:18px}
+.step b{display:block;font-size:15px;letter-spacing:.08em;color:#9A6400;margin-bottom:6px}
+
+/* score bars */
+.srow{margin-bottom:16px}
+.slab{display:flex;justify-content:space-between;font-size:16px;margin-bottom:6px}
+.slab span:last-child{color:var(--sub);font-variant-numeric:tabular-nums}
+.strack{height:12px;border-radius:999px;background:var(--line);overflow:hidden}
+.sfill{height:100%;width:0;border-radius:999px;background:var(--main);
+  transition:width .8s var(--ease)}
+.sfill.top{background:var(--amber)}
+
+.btn{display:block;width:100%;text-align:center;font-family:inherit;font-size:19px;
+  font-weight:800;padding:18px 24px;border-radius:14px;border:none;cursor:pointer;
+  transition:transform .25s var(--ease),box-shadow .25s var(--ease);text-decoration:none}
+.btn.main{background:var(--main);color:#fff;box-shadow:0 6px 20px rgba(47,91,255,.28)}
+.btn.main:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(47,91,255,.36)}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--main);color:var(--main)}
+
+.note{text-align:center;font-size:14px;color:var(--sub);margin-top:28px}
+
+/* confetti */
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.cf{position:absolute;top:-24px;width:9px;height:14px;border-radius:2px;opacity:.95;
+  animation:fall linear forwards}
+@keyframes fall{
+  0%{transform:translate3d(0,0,0) rotate(0deg);opacity:1}
+  100%{transform:translate3d(var(--dx),102vh,0) rotate(var(--rot));opacity:.9}
+}
+@media(prefers-reduced-motion:reduce){
+  .fade,.cf{animation:none}
+  .bar,.sfill{transition:none}
+}
+</style>
+</head>
+<body>
+<div id="confetti" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header>
+    <span class="badge">営業職むけ・10問</span>
+    <h1>あなたのAI活用タイプ診断</h1>
+    <p class="lead">10問に答えるだけ。AIを営業のどこまで活かせているかを4タイプで判定し、次にやるべき1歩をお伝えします。</p>
+  </header>
+
+  <div class="prog" id="prog">
+    <div class="track"><div class="bar" id="bar"></div></div>
+    <div class="pct" id="pct">Q1 / 10</div>
+  </div>
+
+  <main id="app" role="main"></main>
+
+  <p class="note">回答内容はこの画面の中だけで計算されます（どこにも送信されません）。</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- 設問（各選択肢が4つの軸にスコアを加算） ---------- */
+var AXES = [
+  {k:"eff", label:"業務効率化"},
+  {k:"com", label:"顧客コミュニケーション"},
+  {k:"ana", label:"分析・戦略づくり"},
+  {k:"hab", label:"使いこなし・習慣化"}
+];
+
+var QS = [
+  {q:"仕事でAI（ChatGPTなどの生成AI）を使う頻度は？", a:[
+    {t:"ほぼ毎日、いくつもの場面で使っている", s:{hab:3, eff:1}},
+    {t:"週に数回、決まった作業で使っている", s:{hab:2}},
+    {t:"月に数回、思い出したときに使う", s:{hab:1}},
+    {t:"ほとんど使っていない", s:{}}
+  ]},
+  {q:"メールや提案書の文章づくりで、AIをどう使っていますか？", a:[
+    {t:"たたき台をAIに書かせ、自分の言葉で仕上げる", s:{eff:3, com:1}},
+    {t:"自分で書いた文章の推敲・言い換えを頼む", s:{eff:2}},
+    {t:"試したことはあるが、続いていない", s:{eff:1}},
+    {t:"すべて自分で書いている", s:{}}
+  ]},
+  {q:"初回訪問の前、相手企業のリサーチは？", a:[
+    {t:"業界動向や課題まで整理させ、仮説を立ててから行く", s:{ana:3, com:1}},
+    {t:"会社概要やニュースをAIに要約させる", s:{ana:2}},
+    {t:"自分で検索して読み込む", s:{ana:1}},
+    {t:"特に準備せず、その場で聞く", s:{}}
+  ]},
+  {q:"商談後の議事録・報告書のつくり方は？", a:[
+    {t:"メモや録音をAIで要約し、その日のうちに共有する", s:{eff:3, hab:1}},
+    {t:"箇条書きのメモをAIに清書させる", s:{eff:2}},
+    {t:"毎回ゼロから自分で書いている", s:{}},
+    {t:"そもそも記録に残していない", s:{}}
+  ]},
+  {q:"お客様への提案アイデアが浮かばないとき、どうしますか？", a:[
+    {t:"AIと壁打ちして、切り口を何案も出させる", s:{com:3, ana:1}},
+    {t:"似た事例や言い回しをAIに聞く", s:{com:2}},
+    {t:"社内の先輩や上司に相談する", s:{com:1}},
+    {t:"自力で考え抜く", s:{}}
+  ]},
+  {q:"売上や商談データの分析は？", a:[
+    {t:"データをAIに読ませ、傾向と次のアクションまで出す", s:{ana:3, hab:1}},
+    {t:"集計や表の整形をAIに手伝ってもらう", s:{ana:2}},
+    {t:"Excelなどで自分で集計している", s:{ana:1}},
+    {t:"数字の振り返りはあまりしていない", s:{}}
+  ]},
+  {q:"AIへの指示（プロンプト）の書き方は？", a:[
+    {t:"役割・前提・条件・出力形式まで細かく指定する", s:{hab:3, ana:1}},
+    {t:"目的と条件くらいは書くようにしている", s:{hab:2}},
+    {t:"短い一言で聞くことが多い", s:{hab:1}},
+    {t:"どう書けばよいかよく分からない", s:{}}
+  ]},
+  {q:"AIの答えが的外れだったとき、どうしますか？", a:[
+    {t:"指示を直しながら、納得いくまで何度も対話する", s:{hab:3, eff:1}},
+    {t:"聞き方を変えて、もう一度試す", s:{hab:2}},
+    {t:"使えそうな部分だけ拾って終わる", s:{hab:1}},
+    {t:"あきらめて自分でやる", s:{}}
+  ]},
+  {q:"お客様への返信・見積・フォローのスピードは？", a:[
+    {t:"よくある場面をAIでテンプレ化し、当日中に返している", s:{com:3, eff:1}},
+    {t:"使い回す文面をAIで用意している", s:{com:2}},
+    {t:"手打ちだが、なるべく早く返している", s:{com:1}},
+    {t:"つい後回しになりがち", s:{}}
+  ]},
+  {q:"社内でのAIの使い方について、あなたは？", a:[
+    {t:"うまくいった使い方を共有し、チームの仕組みにしている", s:{ana:2, hab:2, com:1}},
+    {t:"聞かれたら自分のやり方を教えている", s:{hab:2}},
+    {t:"自分のためだけに使っている", s:{hab:1}},
+    {t:"特に何もしていない", s:{}}
+  ]}
+];
+
+/* ---------- 4タイプ ---------- */
+var TYPES = {
+  rookie:{
+    tag:"のびしろ最大", name:"スターター・セールス",
+    sub:"AIはこれから。だからこそ、伸びしろがいちばん大きいタイプです。",
+    feat:"AIより自分の足と経験で成果を出してきたタイプ。判断の軸がしっかりしている一方で、事務作業や資料づくりに時間を取られがちです。AIを「相棒」ではなく「難しそうな道具」と感じている段階なので、最初の成功体験ひとつで一気に景色が変わります。",
+    fit:["メールや御礼文のたたき台づくり","商談メモの箇条書きからの議事録化","訪問先の会社概要を3行に要約させる"],
+    step:"明日の朝いちばんに、直近の商談メモを1件そのまま貼り付けて「営業日報の形に、200字でまとめて」とだけ頼んでみてください。10分の作業が1分になる体験が、いちばん確実な第一歩です。"
+  },
+  eff:{
+    tag:"時短マスター", name:"事務ゼロ・スプリンター",
+    sub:"手を止めていた作業をAIに渡し、商談時間を最大化できているタイプです。",
+    feat:"文章づくり・議事録・報告書といった「売上に直結しないのに時間を食う仕事」をAIに任せるのが上手いタイプ。処理速度が武器で、同じ時間で人より多く動けます。一方で、使い方が定型作業に寄りがちで、提案の質や戦略づくりにはまだAIを持ち込めていません。",
+    fit:["定型メール・御礼状・案内文のテンプレ化","商談録音からの議事録と次アクション抽出","提案書のたたき台づくりと構成案出し"],
+    step:"空いた時間を「もう1件の訪問」ではなく「提案の壁打ち」に1回だけ回してみてください。『この顧客に提案する切り口を5つ、それぞれ想定される反論つきで』と頼むと、時短タイプから提案タイプへの扉が開きます。"
+  },
+  com:{
+    tag:"提案クリエイター", name:"壁打ちトーカー",
+    sub:"AIを話し相手にして、提案の切り口とスピードを増やせているタイプです。",
+    feat:"AIを「検索の代わり」ではなく「考えを引き出す相手」として使えているタイプ。ひとりで悩む時間が短く、提案の引き出しが多いのが強みです。お客様への反応も速い。ただし出したアイデアの根拠づけ、つまり数字での裏取りはまだ手薄になりがちです。",
+    fit:["提案の切り口出しと想定問答（反論対応）の準備","お客様の業界に合わせた言い換え・事例づくり","フォロー文面のパターン化と即日返信"],
+    step:"次の提案では、AIが出した切り口をひとつ選び、『この提案を数字で裏づけるには、どんなデータをどう見ればいい？』と続けて聞いてください。ひと言足すだけで、提案の説得力が変わります。"
+  },
+  ana:{
+    tag:"戦略パートナー", name:"データ・ナビゲーター",
+    sub:"AIを数字と戦略に使い、チームにも広げられている上位タイプです。",
+    feat:"AIを作業の道具ではなく「考えるパートナー」として扱えているタイプ。データから傾向を読み、仮説を立ててから商談に臨むため、勝率そのものが上がります。自分の使い方を人に渡せるのも強み。次の課題は、属人的なノウハウをチームの型として残すことです。",
+    fit:["商談データからの受注傾向分析と優先顧客の選定","業界リサーチをもとにした仮説提案の設計","勝ちパターンのプロンプト化とチーム共有"],
+    step:"あなたがよく使う指示を3つだけ選び、『役割・前提・条件・出力形式』の形に整えて共有ドキュメントに置いてください。個人の速さがチームの速さになった瞬間、あなたの成果は一段上がります。"
+  }
+};
+
+/* ---------- 状態 ---------- */
+var answers = new Array(QS.length).fill(null);
+var idx = 0;
+var app = document.getElementById("app");
+var bar = document.getElementById("bar");
+var pct = document.getElementById("pct");
+var prog = document.getElementById("prog");
+
+var MAX = (function(){
+  var m = {eff:0, com:0, ana:0, hab:0};
+  QS.forEach(function(q){
+    AXES.forEach(function(ax){
+      var best = 0;
+      q.a.forEach(function(o){ var v = o.s[ax.k] || 0; if(v > best) best = v; });
+      m[ax.k] += best;
+    });
+  });
+  return m;
+})();
+var MAX_TOTAL = MAX.eff + MAX.com + MAX.ana + MAX.hab;
+
+function el(tag, cls, text){
+  var e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(text != null) e.textContent = text;
+  return e;
+}
+
+function updateProgress(){
+  bar.style.width = ((idx + 1) / QS.length * 100) + "%";
+  pct.textContent = "Q" + (idx + 1) + " / " + QS.length;
+}
+
+/* ---------- 設問画面 ---------- */
+function renderQuestion(){
+  prog.style.display = "";
+  updateProgress();
+  var q = QS[idx];
+  app.innerHTML = "";
+  var card = el("div", "card fade");
+  card.appendChild(el("div", "qno", "Q" + (idx + 1)));
+  card.appendChild(el("h2", "qtext", q.q));
+
+  var opts = el("div", "opts");
+  q.a.forEach(function(o, i){
+    var b = el("button", "opt" + (answers[idx] === i ? " picked" : ""));
+    b.type = "button";
+    b.appendChild(el("span", "mk"));
+    b.appendChild(el("span", null, o.t));
+    b.addEventListener("click", function(){ choose(i, card); });
+    opts.appendChild(b);
+  });
+  card.appendChild(opts);
+
+  var foot = el("div", "foot");
+  var back = el("button", "back", "← 前の質問にもどる");
+  back.type = "button";
+  back.disabled = (idx === 0);
+  back.addEventListener("click", function(){
+    cancelAdvance();
+    if(idx > 0){ idx--; renderQuestion(); }
+  });
+  foot.appendChild(back);
+
+  if(answers[idx] !== null){
+    var fwd = el("button", "back fwd", (idx === QS.length - 1 ? "結果を見る →" : "次の質問へ →"));
+    fwd.type = "button";
+    fwd.addEventListener("click", function(){
+      cancelAdvance();
+      advance();
+    });
+    foot.appendChild(fwd);
+  } else {
+    foot.appendChild(el("span", "tip", "選ぶと自動で次に進みます"));
+  }
+  card.appendChild(foot);
+
+  app.appendChild(card);
+}
+
+var advanceTimer = null;
+function cancelAdvance(){
+  if(advanceTimer !== null){ clearTimeout(advanceTimer); advanceTimer = null; }
+}
+function advance(){
+  if(idx < QS.length - 1){ idx++; renderQuestion(); }
+  else { renderResult(); }
+}
+function choose(i, card){
+  if(advanceTimer !== null) return;
+  answers[idx] = i;
+  var btns = card.querySelectorAll(".opt");
+  for(var n = 0; n < btns.length; n++){
+    btns[n].classList.toggle("picked", n === i);
+    btns[n].disabled = true;
+  }
+  advanceTimer = setTimeout(function(){
+    advanceTimer = null;
+    advance();
+  }, 260);
+}
+
+/* ---------- 判定 ---------- */
+function score(){
+  var s = {eff:0, com:0, ana:0, hab:0};
+  answers.forEach(function(a, qi){
+    if(a === null) return;
+    var m = QS[qi].a[a].s;
+    Object.keys(m).forEach(function(k){ s[k] += m[k]; });
+  });
+  return s;
+}
+
+function ratio(k){ return s0[k] / (MAX[k] || 1); }
+var s0 = {eff:0, com:0, ana:0, hab:0};
+
+function judge(s){
+  s0 = s;
+  var total = s.eff + s.com + s.ana + s.hab;
+  if(total / (MAX_TOTAL || 1) < 0.40) return "rookie";
+  // 習慣化が非常に高い人は、使い方が戦略側に届いていれば戦略パートナー
+  if(ratio("hab") >= 0.80 && ratio("ana") >= 0.55) return "ana";
+  // 同点時は ana → com → eff の順で優先（判定を常に一意にする）
+  var order = ["ana", "com", "eff"];
+  var r = order.map(function(k, i){ return [k, ratio(k), i]; });
+  r.sort(function(a, b){
+    if(b[1] !== a[1]) return b[1] - a[1];
+    return a[2] - b[2];
+  });
+  return r[0][0];
+}
+
+/* ---------- 結果画面 ---------- */
+function renderResult(){
+  var s = score();
+  var key = judge(s);
+  var t = TYPES[key];
+  prog.style.display = "none";
+  app.innerHTML = "";
+
+  var card = el("div", "card fade");
+  card.appendChild(el("span", "rtag", t.tag + "タイプ"));
+  card.appendChild(el("h2", "rname", t.name));
+  card.appendChild(el("p", "rsub", t.sub));
+
+  var s1 = el("div", "sec");
+  s1.appendChild(el("div", "sech", "あなたの回答傾向"));
+  var top = AXES.map(function(ax){ return s[ax.k] / (MAX[ax.k] || 1); });
+  var best = Math.max.apply(null, top);
+  AXES.forEach(function(ax, i){
+    var p = Math.round(top[i] * 100);
+    var row = el("div", "srow");
+    var lab = el("div", "slab");
+    lab.appendChild(el("span", null, ax.label));
+    lab.appendChild(el("span", null, p + "%"));
+    row.appendChild(lab);
+    var tr = el("div", "strack");
+    var fl = el("div", "sfill" + (best > 0 && top[i] === best ? " top" : ""));
+    tr.appendChild(fl);
+    row.appendChild(tr);
+    s1.appendChild(row);
+    setTimeout(function(){
+      if(fl.isConnected) fl.style.width = p + "%";
+    }, 120 + i * 90);
+  });
+  card.appendChild(s1);
+
+  var s2 = el("div", "sec");
+  s2.appendChild(el("div", "sech", "このタイプの特徴"));
+  s2.appendChild(el("p", null, t.feat));
+  card.appendChild(s2);
+
+  var s3 = el("div", "sec");
+  s3.appendChild(el("div", "sech", "向いているAIの使い方"));
+  var ul = el("ul");
+  t.fit.forEach(function(x){ ul.appendChild(el("li", null, x)); });
+  s3.appendChild(ul);
+  card.appendChild(s3);
+
+  var s4 = el("div", "sec");
+  var box = el("div", "step");
+  var b = el("b", null, "次にやるべき、たった1歩");
+  box.appendChild(b);
+  box.appendChild(document.createTextNode(t.step));
+  s4.appendChild(box);
+  card.appendChild(s4);
+
+  var s5 = el("div", "sec");
+  var again = el("button", "btn ghost", "もう一度診断する");
+  again.type = "button";
+  again.addEventListener("click", function(){
+    answers = new Array(QS.length).fill(null);
+    idx = 0;
+    renderQuestion();
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+  s5.appendChild(again);
+  card.appendChild(s5);
+
+  app.appendChild(card);
+  window.scrollTo({top:0, behavior:"smooth"});
+  confetti();
+}
+
+/* ---------- 紙吹雪（ライブラリなし） ---------- */
+var confettiTimer = null;
+function confetti(){
+  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var host = document.getElementById("confetti");
+  if(confettiTimer !== null){ clearTimeout(confettiTimer); }
+  host.innerHTML = "";
+  var colors = ["#2F5BFF", "#F5A524", "#FFFFFF", "#9DB4FF"];
+  for(var i = 0; i < 90; i++){
+    var p = document.createElement("i");
+    p.className = "cf";
+    p.style.left = (Math.random() * 100) + "vw";
+    p.style.background = colors[i % colors.length];
+    p.style.setProperty("--dx", (Math.random() * 160 - 80) + "px");
+    p.style.setProperty("--rot", (Math.random() * 900 - 450) + "deg");
+    p.style.animationDuration = (1.8 + Math.random() * 1.2) + "s";
+    p.style.animationDelay = (Math.random() * 0.5) + "s";
+    p.style.opacity = 0.7 + Math.random() * 0.3;
+    if(i % 3 === 0){ p.style.width = "7px"; p.style.height = "7px"; p.style.borderRadius = "999px"; }
+    host.appendChild(p);
+  }
+  confettiTimer = setTimeout(function(){
+    confettiTimer = null;
+    host.innerHTML = "";
+  }, 3600);
+}
+
+renderQuestion();
+})();
+</script>
+</body>
+</html>
